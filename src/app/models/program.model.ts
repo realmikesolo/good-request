@@ -10,7 +10,7 @@ export default class ProgramModel extends Model {
   @Column({
     allowNull: false,
     primaryKey: true,
-    type: DataTypes.BIGINT,
+    type: DataTypes.INTEGER(),
     autoIncrement: true,
   })
   public declare id: number;

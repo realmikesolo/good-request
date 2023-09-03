@@ -1,7 +1,12 @@
 import { DataTypes } from 'sequelize';
 import { BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
 import ProgramModel from './program.model';
-import { ExerciseDifficulty } from '../../shared/enums/exercise-difficulty.enum';
+
+export enum ExerciseDifficulty {
+  EASY = 'EASY',
+  MEDIUM = 'MEDIUM',
+  HARD = 'HARD',
+}
 
 @Table({
   tableName: 'exercises',
@@ -11,7 +16,7 @@ export default class ExerciseModel extends Model {
   @Column({
     allowNull: false,
     primaryKey: true,
-    type: DataTypes.BIGINT,
+    type: DataTypes.INTEGER(),
     autoIncrement: true,
   })
   public declare id: number;
@@ -32,7 +37,7 @@ export default class ExerciseModel extends Model {
   @ForeignKey(() => ProgramModel)
   @Column({
     allowNull: false,
-    type: DataTypes.BIGINT,
+    type: DataTypes.INTEGER(),
   })
   public programId: number;
 

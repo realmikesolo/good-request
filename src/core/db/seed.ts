@@ -1,7 +1,6 @@
-import { ExerciseDifficulty } from '../shared/enums/exercise-difficulty.enum';
 import { sequelize } from './db';
-import ExerciseModel from './models/exercise.model';
-import ProgramModel from './models/program.model';
+import ExerciseModel, { ExerciseDifficulty } from '../../app/models/exercise.model';
+import ProgramModel from '../../app/models/program.model';
 
 const seedDB = async (): Promise<void> => {
   await sequelize.sync({ force: true });
