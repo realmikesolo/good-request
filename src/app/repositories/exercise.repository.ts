@@ -53,7 +53,7 @@ export class ExerciseRepository {
 
   public async update(options: {
     exercise: ExerciseModel;
-    body: Partial<Pick<ExerciseModel, 'name' | 'difficulty'>>;
+    body: Partial<Pick<ExerciseModel, 'name' | 'difficulty' | 'programId'>>;
   }): Promise<ExerciseModel> {
     const { exercise, body } = options;
 

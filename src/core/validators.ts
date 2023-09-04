@@ -43,7 +43,7 @@ export const PageValidator = (): z.ZodEffects<z.ZodString, number, string> => {
   });
 };
 
-export const ProgramIdValidator = (): z.ZodEffects<z.ZodOptional<z.ZodString>, number | undefined> => {
+export const ProgramIdFilterValidator = (): z.ZodEffects<z.ZodOptional<z.ZodString>, number | undefined> => {
   return z
     .string()
     .optional()

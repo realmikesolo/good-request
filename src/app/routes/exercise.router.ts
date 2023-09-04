@@ -6,7 +6,7 @@ import {
   IdValidator,
   LimitValidator,
   PageValidator,
-  ProgramIdValidator,
+  ProgramIdFilterValidator,
   SearchValidator,
 } from '../../core/validators';
 import { ExerciseSchema } from '../models/exercise.model';
@@ -14,8 +14,12 @@ import { ExerciseRepository } from '../repositories/exercise.repository';
 import { ExerciseService } from '../services/exercise.service';
 import { authJwt } from '../strategies/jwt.strategy';
 import { isAdminMiddleware } from '../middlewares/is-admin.middleware';
+import { ProgramRepository } from '../repositories/program.repository';
 
-const exerciseService = new ExerciseService(new ExerciseRepository(sequelize));
+const exerciseService = new ExerciseService(
+  new ExerciseRepository(sequelize),
+  new ProgramRepository(sequelize),
+);
 
 export async function exerciseRouter(router: Router): Promise<void> {
   router.post('/exercise', authJwt, isAdminMiddleware, async (req, res, next) => {
@@ -24,6 +28,17 @@ export async function exerciseRouter(router: Router): Promise<void> {
       const { data, message } = await exerciseService.create({ body });
 
       res.json({ data, message }).status(HttpStatus.CREATED);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.post('/exercise/:id/program/:programId', authJwt, isAdminMiddleware, async (req, res, next) => {
+    try {
+      const { params } = await AddExerciseToProgramSchema.parseAsync({ params: req.params });
+      const { data, message } = await exerciseService.addToProgram({ params });
+
+      res.json({ data, message }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
@@ -44,6 +59,17 @@ export async function exerciseRouter(router: Router): Promise<void> {
     try {
       const { params, body } = await UpdateExerciseSchema.parseAsync({ params: req.params, body: req.body });
       const { data, message } = await exerciseService.update({ params, body });
+
+      res.json({ data, message }).status(HttpStatus.OK);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.delete('/exercise/:id/program/:programId', authJwt, isAdminMiddleware, async (req, res, next) => {
+    try {
+      const { params } = await RemoveExerciseFromProgramSchema.parseAsync({ params: req.params });
+      const { data, message } = await exerciseService.removeFromProgram({ params });
 
       res.json({ data, message }).status(HttpStatus.OK);
     } catch (e) {
@@ -76,13 +102,26 @@ const CreateExerciseSchema = z
 
 export type CreateExerciseDto = z.infer<typeof CreateExerciseSchema>;
 
+const AddExerciseToProgramSchema = z
+  .object({
+    params: z
+      .object({
+        id: IdValidator(),
+        programId: IdValidator(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export type AddExerciseToProgramDto = z.infer<typeof AddExerciseToProgramSchema>;
+
 const ListExerciseSchema = z
   .object({
     query: z
       .object({
         limit: LimitValidator(1, 100, 10),
         page: PageValidator(),
-        programId: ProgramIdValidator(),
+        programId: ProgramIdFilterValidator(),
         search: SearchValidator(),
       })
       .strict(),
@@ -97,15 +136,27 @@ const UpdateExerciseSchema = z
       .object({
         name: ExerciseSchema.name.optional(),
         difficulty: ExerciseSchema.difficulty.optional(),
+        programId: ProgramIdFilterValidator().optional(),
       })
       .strict(),
-    params: z.object({
-      id: IdValidator(),
-    }),
+    params: z
+      .object({
+        id: IdValidator(),
+      })
+      .strict(),
   })
   .strict();
 
 export type UpdateExerciseDto = z.infer<typeof UpdateExerciseSchema>;
+
+const RemoveExerciseFromProgramSchema = z.object({
+  params: z.object({
+    id: IdValidator(),
+    programId: IdValidator(),
+  }),
+});
+
+export type RemoveExerciseFromProgramDto = z.infer<typeof RemoveExerciseFromProgramSchema>;
 
 const DeleteExerciseSchema = z
   .object({

@@ -6,14 +6,21 @@ import {
 import ExerciseModel from '../models/exercise.model';
 import { ExerciseRepository } from '../repositories/exercise.repository';
 import {
+  AddExerciseToProgramDto,
   CreateExerciseDto,
   DeleteExerciseDto,
   ListExerciseDto,
+  RemoveExerciseFromProgramDto,
   UpdateExerciseDto,
 } from '../routes/exercise.router';
+import { ProgramRepository } from '../repositories/program.repository';
+import { ProgramNotFoundException } from '../exceptions/program.exception';
 
 export class ExerciseService {
-  constructor(private readonly exerciseRepository: ExerciseRepository) {}
+  constructor(
+    private readonly exerciseRepository: ExerciseRepository,
+    private readonly programRepository: ProgramRepository,
+  ) {}
 
   public async create(ctx: CreateExerciseDto): Promise<{
     data: ExerciseModel;
@@ -35,6 +42,35 @@ export class ExerciseService {
     return {
       data: exercise,
       message: 'Exercise created',
+    };
+  }
+
+  public async addToProgram(ctx: AddExerciseToProgramDto): Promise<{
+    data: ExerciseModel;
+    message: string;
+  }> {
+    const { params } = ctx;
+
+    const exercise = await this.exerciseRepository.findOneById({ id: params.id });
+    if (!exercise) {
+      throw new ExerciseNotFoundException();
+    }
+
+    const program = await this.programRepository.findOneById({ id: params.programId });
+    if (!program) {
+      throw new ProgramNotFoundException();
+    }
+
+    const updatedExercise = await this.exerciseRepository.update({
+      exercise,
+      body: {
+        programId: program.id,
+      },
+    });
+
+    return {
+      data: updatedExercise,
+      message: 'Exercise was added to program',
     };
   }
 
@@ -80,6 +116,35 @@ export class ExerciseService {
     return {
       data: updatedExercise,
       message: 'Exercise was updated',
+    };
+  }
+
+  public async removeFromProgram(ctx: RemoveExerciseFromProgramDto): Promise<{
+    data: ExerciseModel;
+    message: string;
+  }> {
+    const { params } = ctx;
+
+    const exercise = await this.exerciseRepository.findOneById({ id: params.id });
+    if (!exercise) {
+      throw new ExerciseNotFoundException();
+    }
+
+    const program = await this.programRepository.findOneById({ id: params.programId });
+    if (!program) {
+      throw new ProgramNotFoundException();
+    }
+
+    const updatedExercise = await this.exerciseRepository.update({
+      exercise,
+      body: {
+        programId: null,
+      },
+    });
+
+    return {
+      data: updatedExercise,
+      message: 'Exercise was removed from program',
     };
   }
 
