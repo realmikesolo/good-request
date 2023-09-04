@@ -25,11 +25,8 @@ const RegisterSchema = z
   .object({
     body: z
       .object({
-        name: UserSchema.name,
-        surname: UserSchema.surname,
-        nickName: UserSchema.nickName,
         email: UserSchema.email,
-        age: UserSchema.age,
+        password: UserSchema.password,
         role: UserSchema.role,
       })
       .strict(),

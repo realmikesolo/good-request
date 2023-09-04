@@ -8,17 +8,12 @@ export class UserRepository {
     this.userModel = this.sequelize.getRepository(UserModel);
   }
 
-  public async create(
-    options: Pick<UserModel, 'name' | 'surname' | 'nickName' | 'email' | 'age' | 'role'>,
-  ): Promise<UserModel> {
-    const { name, surname, nickName, email, age, role } = options;
+  public async create(options: Pick<UserModel, 'email' | 'password' | 'role'>): Promise<UserModel> {
+    const { email, password, role } = options;
 
     return this.userModel.create({
-      name,
-      surname,
-      nickName,
       email,
-      age,
+      password,
       role,
     });
   }
