@@ -1,7 +1,6 @@
+import { Op } from 'sequelize';
 import { Repository, Sequelize } from 'sequelize-typescript';
 import ExerciseModel from '../models/exercise.model';
-import { Op } from 'sequelize';
-import { ExerciseNotFoundException } from '../exceptions/exercise.exception';
 
 export class ExerciseRepository {
   private exerciseModel: Repository<ExerciseModel>;
@@ -19,6 +18,12 @@ export class ExerciseRepository {
         difficulty,
       })
       .then((exercise) => exercise.get({ plain: true }));
+  }
+
+  public async findOneById(options: Pick<ExerciseModel, 'id'>): Promise<ExerciseModel | null> {
+    const { id } = options;
+
+    return this.exerciseModel.findByPk(id);
   }
 
   public async list(options: {
@@ -46,14 +51,18 @@ export class ExerciseRepository {
     });
   }
 
-  public async findOneAndDelete(options: Pick<ExerciseModel, 'id'>): Promise<void> {
-    const { id } = options;
+  public async update(options: {
+    exercise: ExerciseModel;
+    body: Partial<Pick<ExerciseModel, 'name' | 'difficulty'>>;
+  }): Promise<ExerciseModel> {
+    const { exercise, body } = options;
 
-    const exercise = await this.exerciseModel.findByPk(id);
-    if (!exercise) {
-      throw new ExerciseNotFoundException();
-    }
+    return exercise.update(body);
+  }
 
-    await exercise.destroy();
+  public async delete(options: { exercise: ExerciseModel }): Promise<void> {
+    const { exercise } = options;
+
+    return exercise.destroy();
   }
 }

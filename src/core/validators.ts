@@ -69,3 +69,21 @@ export const ProgramIdValidator = (): z.ZodEffects<z.ZodOptional<z.ZodString>, n
 export const SearchValidator = (): z.ZodOptional<z.ZodString> => {
   return z.string().min(3).max(200).optional();
 };
+
+export const IdValidator = (): z.ZodEffects<z.ZodString, number, string> => {
+  return z.string().transform((value, ctx) => {
+    const id = Number(value);
+
+    if (!(Number.isInteger(id) && id >= 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Id must be a number greater than or equal 0',
+        path: ['id'],
+      });
+
+      return z.NEVER;
+    }
+
+    return id;
+  });
+};

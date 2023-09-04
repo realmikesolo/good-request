@@ -2,7 +2,13 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { sequelize } from '../../core/db/db';
 import { HttpStatus } from '../../core/http-status';
-import { LimitValidator, PageValidator, ProgramIdValidator, SearchValidator } from '../../core/validators';
+import {
+  IdValidator,
+  LimitValidator,
+  PageValidator,
+  ProgramIdValidator,
+  SearchValidator,
+} from '../../core/validators';
 import { ExerciseSchema } from '../models/exercise.model';
 import { ExerciseRepository } from '../repositories/exercise.repository';
 import { ExerciseService } from '../services/exercise.service';
@@ -27,6 +33,17 @@ export async function exerciseRouter(router: Router): Promise<void> {
     try {
       const { query } = await ListExerciseSchema.parseAsync({ query: req.query });
       const { data, message } = await exerciseService.list({ query });
+
+      res.json({ data, message }).status(HttpStatus.OK);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.patch('/exercise/:id', authJwt, isAdminMiddleware, async (req, res, next) => {
+    try {
+      const { params, body } = await UpdateExerciseSchema.parseAsync({ params: req.params, body: req.body });
+      const { data, message } = await exerciseService.update({ params, body });
 
       res.json({ data, message }).status(HttpStatus.OK);
     } catch (e) {
@@ -74,25 +91,27 @@ const ListExerciseSchema = z
 
 export type ListExerciseDto = z.infer<typeof ListExerciseSchema>;
 
+const UpdateExerciseSchema = z
+  .object({
+    body: z
+      .object({
+        name: ExerciseSchema.name.optional(),
+        difficulty: ExerciseSchema.difficulty.optional(),
+      })
+      .strict(),
+    params: z.object({
+      id: IdValidator(),
+    }),
+  })
+  .strict();
+
+export type UpdateExerciseDto = z.infer<typeof UpdateExerciseSchema>;
+
 const DeleteExerciseSchema = z
   .object({
     params: z
       .object({
-        id: z.string().transform((value, ctx) => {
-          const id = Number(value);
-
-          if (!(Number.isInteger(id) && id >= 0)) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: 'Id must be a number greater than or equal 0',
-              path: ['id'],
-            });
-
-            return z.NEVER;
-          }
-
-          return id;
-        }),
+        id: IdValidator(),
       })
       .strict(),
   })
