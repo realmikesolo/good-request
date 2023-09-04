@@ -19,6 +19,17 @@ export async function authRouter(router: Router): Promise<void> {
       next(e);
     }
   });
+
+  router.post('/auth/login', async (req, res, next) => {
+    try {
+      const { body } = await LoginSchema.parseAsync({ body: req.body });
+      const { data, message } = await authService.login({ body });
+
+      res.json({ data, message }).status(HttpStatus.OK);
+    } catch (e) {
+      next(e);
+    }
+  });
 }
 
 const RegisterSchema = z
@@ -34,3 +45,12 @@ const RegisterSchema = z
   .strict();
 
 export type RegisterDto = z.infer<typeof RegisterSchema>;
+
+const LoginSchema = z.object({
+  body: z.object({
+    email: UserSchema.email,
+    password: UserSchema.password,
+  }),
+});
+
+export type LoginDto = z.infer<typeof LoginSchema>;

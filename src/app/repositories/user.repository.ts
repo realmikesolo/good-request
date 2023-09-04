@@ -11,16 +11,19 @@ export class UserRepository {
   public async create(options: Pick<UserModel, 'email' | 'password' | 'role'>): Promise<UserModel> {
     const { email, password, role } = options;
 
-    return this.userModel.create({
-      email,
-      password,
-      role,
-    });
+    return this.userModel.create(
+      {
+        email,
+        password,
+        role,
+      },
+      { raw: true },
+    );
   }
 
-  public async findOneById(options: Pick<UserModel, 'id'>): Promise<UserModel | null> {
-    const { id } = options;
+  public async findOneByEmail(options: Pick<UserModel, 'email'>): Promise<UserModel | null> {
+    const { email } = options;
 
-    return this.userModel.findByPk(id, { raw: true });
+    return this.userModel.findOne({ where: { email }, raw: true });
   }
 }
