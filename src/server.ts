@@ -35,7 +35,7 @@ function errorHandler(error: any, req: Request, res: Response, next: NextFunctio
     res.status(error.status).send(error.body);
   } else if (error instanceof ZodError) {
     const exception = new BadRequestException();
-    res.status(exception.status).send(error.flatten());
+    res.status(exception.status).send(error.format());
   } else {
     console.error(error);
 
