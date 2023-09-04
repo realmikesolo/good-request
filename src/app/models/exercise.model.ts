@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
 import ProgramModel from './program.model';
+import { z } from 'zod';
 
 export enum ExerciseDifficulty {
   EASY = 'EASY',
@@ -36,11 +37,17 @@ export default class ExerciseModel extends Model {
 
   @ForeignKey(() => ProgramModel)
   @Column({
-    allowNull: false,
     type: DataTypes.INTEGER(),
   })
-  public programId: number;
+  public programId: number | null;
 
   @BelongsTo(() => ProgramModel)
   public program: ProgramModel;
 }
+
+export const ExerciseSchema = {
+  id: z.number().min(1),
+  name: z.string().min(1).max(200),
+  difficulty: z.nativeEnum(ExerciseDifficulty),
+  programId: z.number().min(1).nullable(),
+};

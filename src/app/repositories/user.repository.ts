@@ -11,14 +11,13 @@ export class UserRepository {
   public async create(options: Pick<UserModel, 'email' | 'password' | 'role'>): Promise<UserModel> {
     const { email, password, role } = options;
 
-    return this.userModel.create(
-      {
+    return this.userModel
+      .create({
         email,
         password,
         role,
-      },
-      { raw: true },
-    );
+      })
+      .then((user) => user.get({ plain: true }));
   }
 
   public async findOneByEmail(options: Pick<UserModel, 'email'>): Promise<UserModel | null> {

@@ -16,7 +16,7 @@ export class AuthService {
   constructor(private readonly userRepository: UserRepository) {}
 
   public async register(ctx: RegisterDto): Promise<{
-    data: UserModel;
+    data: Pick<UserModel, 'id' | 'email' | 'role'>;
     message: string;
   }> {
     const { body } = ctx;
@@ -34,7 +34,11 @@ export class AuthService {
     }
 
     return {
-      data: user,
+      data: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
       message: 'User created',
     };
   }
