@@ -10,6 +10,7 @@ import {
 import { hash, genSalt, compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { Env } from '../../core/env';
+import { JwtPayload } from '../strategies/jwt.strategy';
 
 export class AuthService {
   constructor(private readonly userRepository: UserRepository) {}
@@ -57,7 +58,7 @@ export class AuthService {
     }
 
     return {
-      data: { token: this.generateToken({ id: user.id }) },
+      data: { token: this.generateToken({ id: user.id, role: user.role }) },
       message: 'User logged in',
     };
   }
@@ -66,7 +67,7 @@ export class AuthService {
     return hash(password, await genSalt(10));
   }
 
-  private generateToken(user: Pick<UserModel, 'id'>): string {
+  private generateToken(user: JwtPayload): string {
     return sign(user, Env.JWT_SECRET, { expiresIn: '1d' });
   }
 }

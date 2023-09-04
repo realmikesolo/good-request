@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { sequelize } from '../../core/db/db';
+import { HttpStatus } from '../../core/http-status';
 import { UserSchema } from '../models/user.model';
 import { UserRepository } from '../repositories/user.repository';
 import { AuthService } from '../services/auth.service';
-import { sequelize } from '../../core/db/db';
-import { HttpStatus } from '../../core/http-status';
 
 const authService = new AuthService(new UserRepository(sequelize));
 

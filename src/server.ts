@@ -2,6 +2,8 @@ import bodyParser from 'body-parser';
 import express, { NextFunction, Request, Response, Router } from 'express';
 import { ZodError } from 'zod';
 import { BadRequestException, HttpException, InternalServerErrorException } from './core/http-exceptions';
+import passport from 'passport';
+import { initPassport } from './app/strategies/jwt.strategy';
 
 export async function startServer(options: {
   host: string;
@@ -9,6 +11,8 @@ export async function startServer(options: {
   routers: Array<(router: Router) => void>;
 }): Promise<void> {
   const { host, port, routers } = options;
+
+  initPassport(passport);
 
   const app = express();
 

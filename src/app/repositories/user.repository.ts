@@ -26,4 +26,10 @@ export class UserRepository {
 
     return this.userModel.findOne({ where: { email }, raw: true });
   }
+
+  public async findOneById(options: Pick<UserModel, 'id'>): Promise<UserModel | null> {
+    const { id } = options;
+
+    return this.userModel.findByPk(id, { raw: true });
+  }
 }
