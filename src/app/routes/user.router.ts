@@ -8,10 +8,45 @@ import { HttpStatus } from '../../core/http-status';
 import { authJwt } from '../strategies/jwt.strategy';
 import { UserSchema } from '../models/user.model';
 import { isAdminMiddleware } from '../middlewares/is-admin.middleware';
+import { TrackRepository } from '../repositories/track.repository';
+import { ExerciseRepository } from '../repositories/exercise.repository';
 
-const userService = new UserService(new UserRepository(sequelize));
+const userService = new UserService(
+  new UserRepository(sequelize),
+  new ExerciseRepository(sequelize),
+  new TrackRepository(sequelize),
+);
 
 export async function userRouter(router: Router): Promise<void> {
+  router.post('/user/track-exercise/:id', authJwt, async (req, res, next) => {
+    try {
+      const { params, user, body } = await TrackUserExerciseSchema.parseAsync({
+        params: req.params,
+        user: req.user,
+        body: req.body,
+      });
+      const { data, message } = await userService.trackExercise({ params, user, body });
+
+      res.json({ data, message }).status(HttpStatus.OK);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/user/track-exercise/list', authJwt, async (req, res, next) => {
+    try {
+      const { query, user } = await UserTrackExerciseListSchema.parseAsync({
+        query: req.query,
+        user: req.user,
+      });
+      const { data, message } = await userService.listTrackExercise({ query, user });
+
+      res.json({ data, message }).status(HttpStatus.OK);
+    } catch (e) {
+      next(e);
+    }
+  });
+
   router.get('/user', authJwt, async (req, res, next) => {
     try {
       const { query, user } = await GetUserSchema.parseAsync({ query: req.query, user: req.user });
@@ -45,6 +80,32 @@ export async function userRouter(router: Router): Promise<void> {
     }
   });
 }
+
+const TrackUserExerciseSchema = z.object({
+  params: z.object({
+    id: IdValidator(),
+  }),
+  user: z.object({
+    id: z.number().int().positive().min(1),
+  }),
+  body: z.object({
+    duration: z.number().int().positive().min(1),
+  }),
+});
+
+export type TrackUserExerciseDto = z.infer<typeof TrackUserExerciseSchema>;
+
+const UserTrackExerciseListSchema = z.object({
+  query: z.object({
+    limit: LimitValidator(1, 100, 10),
+    page: PageValidator(),
+  }),
+  user: z.object({
+    id: z.number().int().positive().min(1),
+  }),
+});
+
+export type UserTrackExerciseListDto = z.infer<typeof UserTrackExerciseListSchema>;
 
 const GetUserSchema = z
   .object({

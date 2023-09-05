@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
-import { Column, Table, Model } from 'sequelize-typescript';
+import { Column, Table, Model, HasMany } from 'sequelize-typescript';
 import { z } from 'zod';
+import TrackModel from './track.model';
 
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -58,6 +59,9 @@ export default class UserModel extends Model {
     type: DataTypes.ENUM(...Object.values(UserRole)),
   })
   public role: UserRole;
+
+  @HasMany(() => TrackModel, 'userId')
+  public tracks: TrackModel[];
 }
 
 export const UserSchema = {

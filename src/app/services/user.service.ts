@@ -1,11 +1,76 @@
 import { ForbiddenException } from '../../core/http-exceptions';
+import { ExerciseNotFoundException } from '../exceptions/exercise.exception';
 import { UserNotFoundException } from '../exceptions/user.exception';
+import TrackModel from '../models/track.model';
 import UserModel, { UserRole, UserWithoutPassportModel } from '../models/user.model';
+import { ExerciseRepository } from '../repositories/exercise.repository';
+import { TrackRepository } from '../repositories/track.repository';
 import { UserRepository } from '../repositories/user.repository';
-import { GetUserDto, ListUserDto, UpdateUserDto } from '../routes/user.router';
+import {
+  GetUserDto,
+  ListUserDto,
+  TrackUserExerciseDto,
+  UpdateUserDto,
+  UserTrackExerciseListDto,
+} from '../routes/user.router';
 
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly exerciseRepository: ExerciseRepository,
+    private readonly trackRepository: TrackRepository,
+  ) {}
+
+  public async trackExercise(ctx: TrackUserExerciseDto): Promise<{
+    data: TrackModel;
+    message: string;
+  }> {
+    const { body, user, params } = ctx;
+
+    const userProfile = await this.userRepository.findOneById({ id: user.id, raw: true });
+    if (!userProfile) {
+      throw new UserNotFoundException();
+    }
+
+    const exercise = await this.exerciseRepository.findOneById({ id: params.id });
+    if (!exercise) {
+      throw new ExerciseNotFoundException();
+    }
+
+    const track = await this.trackRepository.create({
+      exerciseId: exercise.id,
+      userId: userProfile.id,
+      duration: body.duration,
+    });
+
+    return {
+      data: track,
+      message: 'Exercise was tracked',
+    };
+  }
+
+  public async listTrackExercise(ctx: UserTrackExerciseListDto): Promise<{
+    data: TrackModel[];
+    message: string;
+  }> {
+    const { query, user } = ctx;
+
+    const userProfile = await this.userRepository.findOneById({ id: user.id, raw: true });
+    if (!userProfile) {
+      throw new UserNotFoundException();
+    }
+
+    const tracks = await this.trackRepository.list({
+      userId: userProfile.id,
+      limit: query.limit,
+      page: query.page,
+    });
+
+    return {
+      data: tracks,
+      message: 'List of tracked exercises',
+    };
+  }
 
   public async get(ctx: GetUserDto): Promise<{
     data: UserWithoutPassportModel;

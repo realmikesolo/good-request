@@ -1,7 +1,8 @@
 import { DataTypes } from 'sequelize';
-import { BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { BelongsTo, Column, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
 import ProgramModel from './program.model';
 import { z } from 'zod';
+import TrackModel from './track.model';
 
 export enum ExerciseDifficulty {
   EASY = 'EASY',
@@ -43,6 +44,9 @@ export default class ExerciseModel extends Model {
 
   @BelongsTo(() => ProgramModel)
   public program: ProgramModel;
+
+  @HasMany(() => TrackModel, 'exerciseId')
+  public tracks: TrackModel[];
 }
 
 export const ExerciseSchema = {
