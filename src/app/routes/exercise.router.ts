@@ -3,10 +3,9 @@ import { z } from 'zod';
 import { sequelize } from '../../core/db/db';
 import { HttpStatus } from '../../core/http-status';
 import {
-  IdValidator,
+  NumericStringValidator,
   LimitValidator,
   PageValidator,
-  ProgramIdFilterValidator,
   SearchValidator,
 } from '../../core/validators';
 import { ExerciseSchema } from '../models/exercise.model';
@@ -106,8 +105,8 @@ const AddExerciseToProgramSchema = z
   .object({
     params: z
       .object({
-        id: IdValidator(),
-        programId: IdValidator(),
+        id: NumericStringValidator(),
+        programId: NumericStringValidator(),
       })
       .strict(),
   })
@@ -121,7 +120,7 @@ const ListExerciseSchema = z
       .object({
         limit: LimitValidator(1, 100, 10),
         page: PageValidator(),
-        programId: ProgramIdFilterValidator(),
+        programId: NumericStringValidator().optional(),
         search: SearchValidator(),
       })
       .strict(),
@@ -136,12 +135,11 @@ const UpdateExerciseSchema = z
       .object({
         name: ExerciseSchema.name.optional(),
         difficulty: ExerciseSchema.difficulty.optional(),
-        programId: ProgramIdFilterValidator().optional(),
       })
       .strict(),
     params: z
       .object({
-        id: IdValidator(),
+        id: NumericStringValidator(),
       })
       .strict(),
   })
@@ -151,8 +149,8 @@ export type UpdateExerciseDto = z.infer<typeof UpdateExerciseSchema>;
 
 const RemoveExerciseFromProgramSchema = z.object({
   params: z.object({
-    id: IdValidator(),
-    programId: IdValidator(),
+    id: NumericStringValidator(),
+    programId: NumericStringValidator(),
   }),
 });
 
@@ -162,7 +160,7 @@ const DeleteExerciseSchema = z
   .object({
     params: z
       .object({
-        id: IdValidator(),
+        id: NumericStringValidator(),
       })
       .strict(),
   })

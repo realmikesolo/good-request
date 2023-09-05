@@ -21,10 +21,10 @@ export class TrackRepository {
       .then((track) => track.get({ plain: true }));
   }
 
-  public async findOne(options: Pick<TrackModel, 'exerciseId' | 'userId'>): Promise<TrackModel | null> {
-    const { exerciseId, userId } = options;
+  public async findOneById(options: Pick<TrackModel, 'id'>): Promise<TrackModel | null> {
+    const { id } = options;
 
-    return this.trackModel.findOne({ where: { exerciseId, userId } });
+    return this.trackModel.findByPk(id);
   }
 
   public async list(options: { userId: number; limit: number; page: number }): Promise<TrackModel[]> {

@@ -50,7 +50,7 @@ export default class ExerciseModel extends Model {
 }
 
 export const ExerciseSchema = {
-  id: z.number().min(1),
+  id: z.number().int().positive(),
   name: z.string().min(1).max(200),
   difficulty: z.nativeEnum(ExerciseDifficulty),
   programId: z.number().min(1).nullable(),

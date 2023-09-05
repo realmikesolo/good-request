@@ -106,7 +106,7 @@ export class UserService {
   }
 
   public async list(ctx: ListUserDto): Promise<{
-    data: UserWithoutPassportModel | Array<Pick<UserModel, 'id' | 'nickName'>>;
+    data: UserWithoutPassportModel[] | Array<Pick<UserModel, 'id' | 'nickName'>>;
     message: string;
   }> {
     const { query, user } = ctx;
@@ -116,19 +116,23 @@ export class UserService {
     return {
       data:
         user.role === UserRole.ADMIN
-          ? users.map((user) => ({
-              id: user.id,
-              name: user.name,
-              surname: user.surname,
-              nickName: user.nickName,
-              age: user.age,
-              email: user.email,
-              role: user.role,
-            }))
-          : users.map((user) => ({
-              id: user.id,
-              nickName: user.nickName,
-            })),
+          ? users.map(
+              (user): UserWithoutPassportModel => ({
+                id: user.id,
+                name: user.name,
+                surname: user.surname,
+                nickName: user.nickName,
+                age: user.age,
+                email: user.email,
+                role: user.role,
+              }),
+            )
+          : users.map(
+              (user): Pick<UserModel, 'id' | 'nickName'> => ({
+                id: user.id,
+                nickName: user.nickName,
+              }),
+            ),
       message: 'List of users',
     };
   }
@@ -165,12 +169,13 @@ export class UserService {
       throw new UserNotFoundException();
     }
 
-    const track = await this.trackRepository.findOne({
-      exerciseId: params.exerciseId,
-      userId: userProfile.id,
-    });
+    const track = await this.trackRepository.findOneById({ id: params.trackId });
     if (!track) {
       throw new TrackNotFoundException();
+    }
+
+    if (track.dataValues.userId !== userProfile.id) {
+      throw new ForbiddenException();
     }
 
     await this.trackRepository.delete({ track });

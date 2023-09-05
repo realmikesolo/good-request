@@ -43,34 +43,11 @@ export const PageValidator = (): z.ZodEffects<z.ZodString, number, string> => {
   });
 };
 
-export const ProgramIdFilterValidator = (): z.ZodEffects<z.ZodOptional<z.ZodString>, number | undefined> => {
-  return z
-    .string()
-    .optional()
-    .transform((value, ctx) => {
-      if (!value) return undefined;
-
-      const programId = Number.parseInt(value);
-
-      if (!(Number.isInteger(programId) && programId >= 0)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'ProgramId must be a number greater than or equal 0',
-          path: ['programId'],
-        });
-
-        return z.NEVER;
-      }
-
-      return programId;
-    });
-};
-
 export const SearchValidator = (): z.ZodOptional<z.ZodString> => {
-  return z.string().min(3).max(200).optional();
+  return z.string().optional();
 };
 
-export const IdValidator = (): z.ZodEffects<z.ZodString, number, string> => {
+export const NumericStringValidator = (): z.ZodEffects<z.ZodString, number, string> => {
   return z.string().transform((value, ctx) => {
     const id = Number(value);
 
@@ -78,7 +55,7 @@ export const IdValidator = (): z.ZodEffects<z.ZodString, number, string> => {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Id must be a number greater than or equal 0',
-        path: ['id'],
+        path: ctx.path,
       });
 
       return z.NEVER;

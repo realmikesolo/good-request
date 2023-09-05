@@ -46,11 +46,15 @@ const RegisterSchema = z
 
 export type RegisterDto = z.infer<typeof RegisterSchema>;
 
-const LoginSchema = z.object({
-  body: z.object({
-    email: UserSchema.email,
-    password: UserSchema.password,
-  }),
-});
+const LoginSchema = z
+  .object({
+    body: z
+      .object({
+        email: UserSchema.email,
+        password: UserSchema.password,
+      })
+      .strict(),
+  })
+  .strict();
 
 export type LoginDto = z.infer<typeof LoginSchema>;

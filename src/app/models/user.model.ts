@@ -65,7 +65,7 @@ export default class UserModel extends Model {
 }
 
 export const UserSchema = {
-  id: z.number().min(1),
+  id: z.number().int().positive(),
   name: z.string().min(3).max(200),
   surname: z.string().min(3).max(200),
   nickName: z.string().min(3).max(200),
@@ -77,7 +77,7 @@ export const UserSchema = {
     .refine((value) => /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$&*]).+$/.test(value), {
       message: 'Password must contain at least one uppercase letter, one number and one special character',
     }),
-  age: z.number().min(0).max(200),
+  age: z.number().int().positive().max(200),
   role: z.nativeEnum(UserRole),
 };
 

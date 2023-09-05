@@ -44,9 +44,7 @@ export class AuthService {
   }
 
   public async login(ctx: LoginDto): Promise<{
-    data: {
-      token: string;
-    };
+    data: { token: string };
     message: string;
   }> {
     const { body } = ctx;
@@ -62,13 +60,18 @@ export class AuthService {
     }
 
     return {
-      data: { token: this.generateToken({ id: user.id, role: user.role }) },
+      data: {
+        token: this.generateToken({
+          id: user.id,
+          role: user.role,
+        }),
+      },
       message: 'User logged in',
     };
   }
 
   private async hashPassword(password: string): Promise<string> {
-    return hash(password, await genSalt(10));
+    return hash(password, await genSalt(12));
   }
 
   private generateToken(user: JwtPayload): string {

@@ -26,5 +26,3 @@ export function initPassport(passport: PassportStatic): void {
 export const authJwt = passport.authenticate('jwt', { session: false });
 
 export type JwtPayload = Pick<UserModel, 'id' | 'role'>;
-
-export type AuthRequest = Request & { user?: JwtPayload };

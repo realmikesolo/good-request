@@ -4,7 +4,10 @@
   "description": "Testing assigments for Backend developer interview",
   "private": true,
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "seed": "ts-node src/core/db/seed.ts"
