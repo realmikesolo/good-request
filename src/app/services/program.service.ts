@@ -4,6 +4,7 @@ import { ListProgramDto } from '../routes/program.router';
 
 export class ProgramService {
   constructor(private readonly programRepository: ProgramRepository) {}
+
   public async list(ctx: ListProgramDto): Promise<{
     data: ProgramModel[];
     message: string;

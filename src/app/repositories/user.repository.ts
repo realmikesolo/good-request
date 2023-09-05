@@ -31,4 +31,15 @@ export class UserRepository {
 
     return this.userModel.findByPk(id, { raw: true });
   }
+
+  public async list(options: { limit: number; page: number }): Promise<UserModel[]> {
+    const { limit, page } = options;
+    const offset = limit * page;
+
+    return this.userModel.findAll({
+      limit,
+      offset,
+      raw: true,
+    });
+  }
 }
