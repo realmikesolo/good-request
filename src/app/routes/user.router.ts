@@ -7,6 +7,7 @@ import { sequelize } from '../../core/db/db';
 import { HttpStatus } from '../../core/http-status';
 import { authJwt } from '../strategies/jwt.strategy';
 import { UserSchema } from '../models/user.model';
+import { isAdminMiddleware } from '../middlewares/is-admin.middleware';
 
 const userService = new UserService(new UserRepository(sequelize));
 
@@ -26,6 +27,17 @@ export async function userRouter(router: Router): Promise<void> {
     try {
       const { query, user } = await ListUserSchema.parseAsync({ query: req.query, user: req.user });
       const { data, message } = await userService.list({ query, user });
+
+      res.json({ data, message }).status(HttpStatus.OK);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.patch('/user', authJwt, isAdminMiddleware, async (req, res, next) => {
+    try {
+      const { body, query } = await UpdateUserSchema.parseAsync({ body: req.body, query: req.query });
+      const { data, message } = await userService.update({ body, query });
 
       res.json({ data, message }).status(HttpStatus.OK);
     } catch (e) {
@@ -64,3 +76,18 @@ const ListUserSchema = z
   .strict();
 
 export type ListUserDto = z.infer<typeof ListUserSchema>;
+
+const UpdateUserSchema = z.object({
+  body: z.object({
+    name: UserSchema.name.optional(),
+    surname: UserSchema.surname.optional(),
+    nickName: UserSchema.nickName.optional(),
+    age: UserSchema.age.optional(),
+    role: UserSchema.role.optional(),
+  }),
+  query: z.object({
+    id: IdValidator(),
+  }),
+});
+
+export type UpdateUserDto = z.infer<typeof UpdateUserSchema>;

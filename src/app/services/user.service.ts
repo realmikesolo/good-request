@@ -1,7 +1,7 @@
 import { UserNotFoundException } from '../exceptions/user.exception';
 import UserModel, { UserRole, UserWithoutPassportModel } from '../models/user.model';
 import { UserRepository } from '../repositories/user.repository';
-import { GetUserDto, ListUserDto } from '../routes/user.router';
+import { GetUserDto, ListUserDto, UpdateUserDto } from '../routes/user.router';
 
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
@@ -14,7 +14,7 @@ export class UserService {
 
     const userId = query.id ?? user.id;
 
-    const userInfo = await this.userRepository.findOneById({ id: userId });
+    const userInfo = await this.userRepository.findOneById({ id: userId, raw: true });
     if (!userInfo) {
       throw new UserNotFoundException();
     }
@@ -58,6 +58,28 @@ export class UserService {
               nickName: user.nickName,
             })),
       message: 'List of users',
+    };
+  }
+
+  public async update(ctx: UpdateUserDto): Promise<{
+    data: UserModel;
+    message: string;
+  }> {
+    const { body, query } = ctx;
+
+    const user = await this.userRepository.findOneById({ id: query.id, raw: false });
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    const updatedUser = await this.userRepository.update({
+      user,
+      body,
+    });
+
+    return {
+      data: updatedUser,
+      message: 'User was updated',
     };
   }
 }

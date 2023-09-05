@@ -26,10 +26,10 @@ export class UserRepository {
     return this.userModel.findOne({ where: { email }, raw: true });
   }
 
-  public async findOneById(options: Pick<UserModel, 'id'>): Promise<UserModel | null> {
-    const { id } = options;
+  public async findOneById(options: Pick<UserModel, 'id'> & { raw: boolean }): Promise<UserModel | null> {
+    const { id, raw } = options;
 
-    return this.userModel.findByPk(id, { raw: true });
+    return this.userModel.findByPk(id, { raw });
   }
 
   public async list(options: { limit: number; page: number }): Promise<UserModel[]> {
@@ -41,5 +41,14 @@ export class UserRepository {
       offset,
       raw: true,
     });
+  }
+
+  public async update(options: {
+    user: UserModel;
+    body: Partial<Pick<UserModel, 'name' | 'surname' | 'nickName' | 'age' | 'role'>>;
+  }): Promise<UserModel> {
+    const { user, body } = options;
+
+    return user.update(body);
   }
 }
