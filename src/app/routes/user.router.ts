@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { LimitValidator, PageValidator } from '../../core/validators';
+import { IdValidator, LimitValidator, PageValidator } from '../../core/validators';
 import { UserService } from '../services/user.service';
 import { UserRepository } from '../repositories/user.repository';
 import { sequelize } from '../../core/db/db';
@@ -11,6 +11,17 @@ import { UserSchema } from '../models/user.model';
 const userService = new UserService(new UserRepository(sequelize));
 
 export async function userRouter(router: Router): Promise<void> {
+  router.get('/user', authJwt, async (req, res, next) => {
+    try {
+      const { query, user } = await GetUserSchema.parseAsync({ query: req.query, user: req.user });
+      const { data, message } = await userService.get({ query, user });
+
+      res.json({ data, message }).status(HttpStatus.OK);
+    } catch (e) {
+      next(e);
+    }
+  });
+
   router.get('/user/list', authJwt, async (req, res, next) => {
     try {
       const { query, user } = await ListUserSchema.parseAsync({ query: req.query, user: req.user });
@@ -22,6 +33,21 @@ export async function userRouter(router: Router): Promise<void> {
     }
   });
 }
+
+const GetUserSchema = z
+  .object({
+    query: z
+      .object({
+        id: IdValidator().optional(),
+      })
+      .strict(),
+    user: z.object({
+      id: z.number().int().positive().min(1),
+    }),
+  })
+  .strict();
+
+export type GetUserDto = z.infer<typeof GetUserSchema>;
 
 const ListUserSchema = z
   .object({

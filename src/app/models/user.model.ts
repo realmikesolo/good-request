@@ -76,3 +76,8 @@ export const UserSchema = {
   age: z.number().min(0).max(200).nullable(),
   role: z.nativeEnum(UserRole),
 };
+
+export type UserWithoutPassportModel = Pick<
+  UserModel,
+  'id' | 'name' | 'surname' | 'nickName' | 'age' | 'email' | 'role'
+>;
