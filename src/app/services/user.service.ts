@@ -1,5 +1,6 @@
 import { ForbiddenException } from '../../core/http-exceptions';
 import { ExerciseNotFoundException } from '../exceptions/exercise.exception';
+import { TrackNotFoundException } from '../exceptions/track.exception';
 import { UserNotFoundException } from '../exceptions/user.exception';
 import TrackModel from '../models/track.model';
 import UserModel, { UserRole, UserWithoutPassportModel } from '../models/user.model';
@@ -9,9 +10,10 @@ import { UserRepository } from '../repositories/user.repository';
 import {
   GetUserDto,
   ListUserDto,
-  TrackUserExerciseDto,
+  UserTrackExerciseDto,
   UpdateUserDto,
   UserTrackExerciseListDto,
+  UserRemoveTrackExerciseDto,
 } from '../routes/user.router';
 
 export class UserService {
@@ -21,7 +23,7 @@ export class UserService {
     private readonly trackRepository: TrackRepository,
   ) {}
 
-  public async trackExercise(ctx: TrackUserExerciseDto): Promise<{
+  public async trackExercise(ctx: UserTrackExerciseDto): Promise<{
     data: TrackModel;
     message: string;
   }> {
@@ -32,7 +34,7 @@ export class UserService {
       throw new UserNotFoundException();
     }
 
-    const exercise = await this.exerciseRepository.findOneById({ id: params.id });
+    const exercise = await this.exerciseRepository.findOneById({ id: params.exerciseId });
     if (!exercise) {
       throw new ExerciseNotFoundException();
     }
@@ -150,6 +152,31 @@ export class UserService {
     return {
       data: updatedUser,
       message: 'User was updated',
+    };
+  }
+
+  public async removeTrackedExercise(ctx: UserRemoveTrackExerciseDto): Promise<{
+    message: string;
+  }> {
+    const { params, user } = ctx;
+
+    const userProfile = await this.userRepository.findOneById({ id: user.id, raw: true });
+    if (!userProfile) {
+      throw new UserNotFoundException();
+    }
+
+    const track = await this.trackRepository.findOne({
+      exerciseId: params.exerciseId,
+      userId: userProfile.id,
+    });
+    if (!track) {
+      throw new TrackNotFoundException();
+    }
+
+    await this.trackRepository.delete({ track });
+
+    return {
+      message: 'Tracked exercise was removed',
     };
   }
 }

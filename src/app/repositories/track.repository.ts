@@ -21,6 +21,12 @@ export class TrackRepository {
       .then((track) => track.get({ plain: true }));
   }
 
+  public async findOne(options: Pick<TrackModel, 'exerciseId' | 'userId'>): Promise<TrackModel | null> {
+    const { exerciseId, userId } = options;
+
+    return this.trackModel.findOne({ where: { exerciseId, userId } });
+  }
+
   public async list(options: { userId: number; limit: number; page: number }): Promise<TrackModel[]> {
     const { userId, limit, page } = options;
     const offset = limit * page;
@@ -33,5 +39,11 @@ export class TrackRepository {
       offset,
       raw: true,
     });
+  }
+
+  public async delete(options: { track: TrackModel }): Promise<void> {
+    const { track } = options;
+
+    return track.destroy();
   }
 }

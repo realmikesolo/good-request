@@ -18,9 +18,9 @@ const userService = new UserService(
 );
 
 export async function userRouter(router: Router): Promise<void> {
-  router.post('/user/track-exercise/:id', authJwt, async (req, res, next) => {
+  router.post('/user/track-exercise/:exerciseId', authJwt, async (req, res, next) => {
     try {
-      const { params, user, body } = await TrackUserExerciseSchema.parseAsync({
+      const { params, user, body } = await UserTrackExerciseSchema.parseAsync({
         params: req.params,
         user: req.user,
         body: req.body,
@@ -79,45 +79,45 @@ export async function userRouter(router: Router): Promise<void> {
       next(e);
     }
   });
+
+  router.delete('/user/track-exercise/:exerciseId', authJwt, async (req, res, next) => {
+    try {
+      const { params, user } = await UserRemoveTrackExerciseSchema.parseAsync({
+        params: req.params,
+        user: req.user,
+      });
+      const { message } = await userService.removeTrackedExercise({ params, user });
+
+      res.json({ message }).status(HttpStatus.OK);
+    } catch (e) {
+      next(e);
+    }
+  });
 }
 
-const TrackUserExerciseSchema = z.object({
-  params: z.object({
-    id: IdValidator(),
-  }),
-  user: z.object({
-    id: z.number().int().positive().min(1),
-  }),
-  body: z.object({
-    duration: z.number().int().positive().min(1),
-  }),
-});
+const UserTrackExerciseSchema = z
+  .object({
+    params: z.object({ exerciseId: IdValidator() }).strict(),
+    user: z.object({ id: z.number().int().positive().min(1) }),
+    body: z.object({ duration: z.number().int().positive().min(1) }).strict(),
+  })
+  .strict();
 
-export type TrackUserExerciseDto = z.infer<typeof TrackUserExerciseSchema>;
+export type UserTrackExerciseDto = z.infer<typeof UserTrackExerciseSchema>;
 
-const UserTrackExerciseListSchema = z.object({
-  query: z.object({
-    limit: LimitValidator(1, 100, 10),
-    page: PageValidator(),
-  }),
-  user: z.object({
-    id: z.number().int().positive().min(1),
-  }),
-});
+const UserTrackExerciseListSchema = z
+  .object({
+    query: z.object({ limit: LimitValidator(1, 100, 10), page: PageValidator() }).strict(),
+    user: z.object({ id: z.number().int().positive().min(1) }),
+  })
+  .strict();
 
 export type UserTrackExerciseListDto = z.infer<typeof UserTrackExerciseListSchema>;
 
 const GetUserSchema = z
   .object({
-    query: z
-      .object({
-        id: IdValidator().optional(),
-      })
-      .strict(),
-    user: z.object({
-      id: z.number().int().positive().min(1),
-      role: UserSchema.role,
-    }),
+    query: z.object({ id: IdValidator().optional() }).strict(),
+    user: z.object({ id: z.number().int().positive().min(1), role: UserSchema.role }),
   })
   .strict();
 
@@ -125,31 +125,35 @@ export type GetUserDto = z.infer<typeof GetUserSchema>;
 
 const ListUserSchema = z
   .object({
-    query: z
-      .object({
-        limit: LimitValidator(1, 100, 10),
-        page: PageValidator(),
-      })
-      .strict(),
-    user: z.object({
-      role: UserSchema.role,
-    }),
+    query: z.object({ limit: LimitValidator(1, 100, 10), page: PageValidator() }).strict(),
+    user: z.object({ role: UserSchema.role }),
   })
   .strict();
 
 export type ListUserDto = z.infer<typeof ListUserSchema>;
 
-const UpdateUserSchema = z.object({
-  body: z.object({
-    name: UserSchema.name.optional(),
-    surname: UserSchema.surname.optional(),
-    nickName: UserSchema.nickName.optional(),
-    age: UserSchema.age.optional(),
-    role: UserSchema.role.optional(),
-  }),
-  query: z.object({
-    id: IdValidator(),
-  }),
-});
+const UpdateUserSchema = z
+  .object({
+    body: z
+      .object({
+        name: UserSchema.name.optional(),
+        surname: UserSchema.surname.optional(),
+        nickName: UserSchema.nickName.optional(),
+        age: UserSchema.age.optional(),
+        role: UserSchema.role.optional(),
+      })
+      .strict(),
+    query: z.object({ id: IdValidator() }).strict(),
+  })
+  .strict();
 
 export type UpdateUserDto = z.infer<typeof UpdateUserSchema>;
+
+const UserRemoveTrackExerciseSchema = z
+  .object({
+    params: z.object({ exerciseId: IdValidator() }).strict(),
+    user: z.object({ id: z.number().int().positive().min(1) }),
+  })
+  .strict();
+
+export type UserRemoveTrackExerciseDto = z.infer<typeof UserRemoveTrackExerciseSchema>;
