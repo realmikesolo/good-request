@@ -1,3 +1,4 @@
+import { ForbiddenException } from '../../core/http-exceptions';
 import { UserNotFoundException } from '../exceptions/user.exception';
 import UserModel, { UserRole, UserWithoutPassportModel } from '../models/user.model';
 import { UserRepository } from '../repositories/user.repository';
@@ -11,6 +12,10 @@ export class UserService {
     message: string;
   }> {
     const { query, user } = ctx;
+
+    if (user.role !== UserRole.ADMIN && query.id) {
+      throw new ForbiddenException();
+    }
 
     const userId = query.id ?? user.id;
 

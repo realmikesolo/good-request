@@ -55,6 +55,7 @@ const GetUserSchema = z
       .strict(),
     user: z.object({
       id: z.number().int().positive().min(1),
+      role: UserSchema.role,
     }),
   })
   .strict();
