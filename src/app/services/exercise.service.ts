@@ -22,10 +22,7 @@ export class ExerciseService {
     private readonly programRepository: ProgramRepository,
   ) {}
 
-  public async create(ctx: CreateExerciseDto): Promise<{
-    data: ExerciseModel;
-    message: string;
-  }> {
+  public async create(ctx: CreateExerciseDto): Promise<ExerciseModel> {
     const { body } = ctx;
 
     let exercise: ExerciseModel;
@@ -39,16 +36,10 @@ export class ExerciseService {
       throw e;
     }
 
-    return {
-      data: exercise,
-      message: 'Exercise created',
-    };
+    return exercise;
   }
 
-  public async addToProgram(ctx: AddExerciseToProgramDto): Promise<{
-    data: ExerciseModel;
-    message: string;
-  }> {
+  public async addToProgram(ctx: AddExerciseToProgramDto): Promise<ExerciseModel> {
     const { params } = ctx;
 
     const exercise = await this.exerciseRepository.findOneById({ id: params.id });
@@ -61,37 +52,21 @@ export class ExerciseService {
       throw new ProgramNotFoundException();
     }
 
-    const updatedExercise = await this.exerciseRepository.update({
+    return this.exerciseRepository.update({
       exercise,
       body: {
         programId: program.id,
       },
     });
-
-    return {
-      data: updatedExercise,
-      message: 'Exercise was added to program',
-    };
   }
 
-  public async list(ctx: ListExerciseDto): Promise<{
-    data: ExerciseModel[];
-    message: string;
-  }> {
+  public async list(ctx: ListExerciseDto): Promise<ExerciseModel[]> {
     const { query } = ctx;
 
-    const exercises = await this.exerciseRepository.list(query);
-
-    return {
-      data: exercises,
-      message: 'List of exercises',
-    };
+    return this.exerciseRepository.list(query);
   }
 
-  public async update(ctx: UpdateExerciseDto): Promise<{
-    data: ExerciseModel;
-    message: string;
-  }> {
+  public async update(ctx: UpdateExerciseDto): Promise<ExerciseModel> {
     const { params, body } = ctx;
 
     const exercise = await this.exerciseRepository.findOneById(params);
@@ -113,16 +88,10 @@ export class ExerciseService {
       throw e;
     }
 
-    return {
-      data: updatedExercise,
-      message: 'Exercise was updated',
-    };
+    return updatedExercise;
   }
 
-  public async removeFromProgram(ctx: RemoveExerciseFromProgramDto): Promise<{
-    data: ExerciseModel;
-    message: string;
-  }> {
+  public async removeFromProgram(ctx: RemoveExerciseFromProgramDto): Promise<ExerciseModel> {
     const { params } = ctx;
 
     const exercise = await this.exerciseRepository.findOneById({ id: params.id });
@@ -135,22 +104,15 @@ export class ExerciseService {
       throw new ProgramNotFoundException();
     }
 
-    const updatedExercise = await this.exerciseRepository.update({
+    return this.exerciseRepository.update({
       exercise,
       body: {
         programId: null,
       },
     });
-
-    return {
-      data: updatedExercise,
-      message: 'Exercise was removed from program',
-    };
   }
 
-  public async delete(ctx: DeleteExerciseDto): Promise<{
-    message: string;
-  }> {
+  public async delete(ctx: DeleteExerciseDto): Promise<void> {
     const { params } = ctx;
 
     const exercise = await this.exerciseRepository.findOneById(params);
@@ -159,9 +121,5 @@ export class ExerciseService {
     }
 
     await this.exerciseRepository.delete({ exercise });
-
-    return {
-      message: 'Exercise was deleted',
-    };
   }
 }

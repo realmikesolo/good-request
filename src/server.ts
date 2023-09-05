@@ -4,6 +4,15 @@ import { ZodError } from 'zod';
 import { BadRequestException, HttpException, InternalServerErrorException } from './core/http-exceptions';
 import passport from 'passport';
 import { initPassport } from './app/strategies/jwt.strategy';
+import { I18n } from 'i18n';
+import { resolve } from 'node:path';
+
+const i18n = new I18n({
+  header: 'language',
+  defaultLocale: 'en',
+  locales: ['en', 'sk'],
+  directory: resolve(__dirname, '../locales'),
+});
 
 export async function startServer(options: {
   host: string;
@@ -16,6 +25,7 @@ export async function startServer(options: {
 
   const app = express();
 
+  app.use(i18n.init);
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 

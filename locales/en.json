@@ -1,0 +1,17 @@
+{
+  "user_created": "User was created",
+  "user_logged_in": "User logged in",
+  "exercise_created": "Exercise was created",
+  "add_exercise_to_program": "Exercise was added to program",
+  "list_exercise": "List of exercises",
+  "exercise_updated": "Exercise was updated",
+  "remove_exercise_from_program": "Exercise was removed from program",
+  "exercise_deleted": "Exercise was deleted",
+  "list_programs": "List of programs",
+  "exercise_tracked": "Exercise was tracked",
+  "list_tracked_exercises": "List of tracked exercises",
+  "user_info": "User info",
+  "list_users": "List of users",
+  "user_updated": "User was updated",
+  "tracked_exercise_deleted": "Tracked exercise was deleted"
+}

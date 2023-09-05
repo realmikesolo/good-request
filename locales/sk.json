@@ -1,0 +1,17 @@
+{
+  "user_created": "Používateľ bol vytvorený",
+  "user_logged_in": "Používateľ sa prihlásil",
+  "exercise_created": "Cvičenie bolo vytvorené",
+  "add_exercise_to_program": "Cvičenie bolo pridané do programu",
+  "list_exercise": "Zoznam cvičení",
+  "exercise_updated": "Cvičenie bolo aktualizované",
+  "remove_exercise_from_program": "Cvičenie bolo odstránené z programu",
+  "exercise_deleted": "Cvičenie bolo vymazané",
+  "list_programs": "Zoznam programov",
+  "exercise_tracked": "Cvičenie bolo sledované",
+  "list_tracked_exercises": "Zoznam sledovaných cvičení",
+  "user_info": "Informácie o používateľovi",
+  "list_users": "Zoznam používateľov",
+  "user_updated": "Používateľ bol aktualizovaný",
+  "tracked_exercise_deleted": "Sledované cvičenie bolo vymazané"
+}

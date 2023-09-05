@@ -5,17 +5,9 @@ import { ListProgramDto } from '../routes/program.router';
 export class ProgramService {
   constructor(private readonly programRepository: ProgramRepository) {}
 
-  public async list(ctx: ListProgramDto): Promise<{
-    data: ProgramModel[];
-    message: string;
-  }> {
+  public async list(ctx: ListProgramDto): Promise<ProgramModel[]> {
     const { query } = ctx;
 
-    const programs = await this.programRepository.list(query);
-
-    return {
-      data: programs,
-      message: 'List of programs',
-    };
+    return this.programRepository.list(query);
   }
 }

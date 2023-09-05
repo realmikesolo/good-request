@@ -23,10 +23,7 @@ export class UserService {
     private readonly trackRepository: TrackRepository,
   ) {}
 
-  public async trackExercise(ctx: UserTrackExerciseDto): Promise<{
-    data: TrackModel;
-    message: string;
-  }> {
+  public async trackExercise(ctx: UserTrackExerciseDto): Promise<TrackModel> {
     const { body, user, params } = ctx;
 
     const userProfile = await this.userRepository.findOneById({ id: user.id, raw: true });
@@ -39,22 +36,14 @@ export class UserService {
       throw new ExerciseNotFoundException();
     }
 
-    const track = await this.trackRepository.create({
+    return this.trackRepository.create({
       exerciseId: exercise.id,
       userId: userProfile.id,
       duration: body.duration,
     });
-
-    return {
-      data: track,
-      message: 'Exercise was tracked',
-    };
   }
 
-  public async listTrackExercise(ctx: UserTrackExerciseListDto): Promise<{
-    data: TrackModel[];
-    message: string;
-  }> {
+  public async listTrackExercise(ctx: UserTrackExerciseListDto): Promise<TrackModel[]> {
     const { query, user } = ctx;
 
     const userProfile = await this.userRepository.findOneById({ id: user.id, raw: true });
@@ -62,22 +51,14 @@ export class UserService {
       throw new UserNotFoundException();
     }
 
-    const tracks = await this.trackRepository.list({
+    return this.trackRepository.list({
       userId: userProfile.id,
       limit: query.limit,
       page: query.page,
     });
-
-    return {
-      data: tracks,
-      message: 'List of tracked exercises',
-    };
   }
 
-  public async get(ctx: GetUserDto): Promise<{
-    data: UserWithoutPassportModel;
-    message: string;
-  }> {
+  public async get(ctx: GetUserDto): Promise<UserWithoutPassportModel> {
     const { query, user } = ctx;
 
     if (user.role !== UserRole.ADMIN && query.id) {
@@ -92,55 +73,44 @@ export class UserService {
     }
 
     return {
-      data: {
-        id: userInfo.id,
-        name: userInfo.name,
-        surname: userInfo.surname,
-        nickName: userInfo.nickName,
-        age: userInfo.age,
-        email: userInfo.email,
-        role: userInfo.role,
-      },
-      message: 'User info',
+      id: userInfo.id,
+      name: userInfo.name,
+      surname: userInfo.surname,
+      nickName: userInfo.nickName,
+      age: userInfo.age,
+      email: userInfo.email,
+      role: userInfo.role,
     };
   }
 
-  public async list(ctx: ListUserDto): Promise<{
-    data: UserWithoutPassportModel[] | Array<Pick<UserModel, 'id' | 'nickName'>>;
-    message: string;
-  }> {
+  public async list(
+    ctx: ListUserDto,
+  ): Promise<UserWithoutPassportModel[] | Array<Pick<UserModel, 'id' | 'nickName'>>> {
     const { query, user } = ctx;
 
     const users = await this.userRepository.list(query);
 
-    return {
-      data:
-        user.role === UserRole.ADMIN
-          ? users.map(
-              (user): UserWithoutPassportModel => ({
-                id: user.id,
-                name: user.name,
-                surname: user.surname,
-                nickName: user.nickName,
-                age: user.age,
-                email: user.email,
-                role: user.role,
-              }),
-            )
-          : users.map(
-              (user): Pick<UserModel, 'id' | 'nickName'> => ({
-                id: user.id,
-                nickName: user.nickName,
-              }),
-            ),
-      message: 'List of users',
-    };
+    return user.role === UserRole.ADMIN
+      ? users.map(
+          (user): UserWithoutPassportModel => ({
+            id: user.id,
+            name: user.name,
+            surname: user.surname,
+            nickName: user.nickName,
+            age: user.age,
+            email: user.email,
+            role: user.role,
+          }),
+        )
+      : users.map(
+          (user): Pick<UserModel, 'id' | 'nickName'> => ({
+            id: user.id,
+            nickName: user.nickName,
+          }),
+        );
   }
 
-  public async update(ctx: UpdateUserDto): Promise<{
-    data: UserModel;
-    message: string;
-  }> {
+  public async update(ctx: UpdateUserDto): Promise<UserModel> {
     const { body, query } = ctx;
 
     const user = await this.userRepository.findOneById({ id: query.id, raw: false });
@@ -148,20 +118,13 @@ export class UserService {
       throw new UserNotFoundException();
     }
 
-    const updatedUser = await this.userRepository.update({
+    return this.userRepository.update({
       user,
       body,
     });
-
-    return {
-      data: updatedUser,
-      message: 'User was updated',
-    };
   }
 
-  public async removeTrackedExercise(ctx: UserRemoveTrackExerciseDto): Promise<{
-    message: string;
-  }> {
+  public async removeTrackedExercise(ctx: UserRemoveTrackExerciseDto): Promise<void> {
     const { params, user } = ctx;
 
     const userProfile = await this.userRepository.findOneById({ id: user.id, raw: true });
@@ -179,9 +142,5 @@ export class UserService {
     }
 
     await this.trackRepository.delete({ track });
-
-    return {
-      message: 'Tracked exercise was removed',
-    };
   }
 }

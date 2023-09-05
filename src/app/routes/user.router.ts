@@ -24,9 +24,9 @@ export async function userRouter(router: Router): Promise<void> {
         params: req.params,
         body: req.body,
       });
-      const { data, message } = await userService.trackExercise({ params, body, user: req.user! });
+      const data = await userService.trackExercise({ params, body, user: req.user! });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('exercise_tracked') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
@@ -35,9 +35,9 @@ export async function userRouter(router: Router): Promise<void> {
   router.get('/user/track-exercise/list', authJwt, async (req, res, next) => {
     try {
       const { query } = await UserTrackExerciseListSchema.parseAsync({ query: req.query });
-      const { data, message } = await userService.listTrackExercise({ query, user: req.user! });
+      const data = await userService.listTrackExercise({ query, user: req.user! });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('list_tracked_exercises') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
@@ -46,9 +46,9 @@ export async function userRouter(router: Router): Promise<void> {
   router.get('/user', authJwt, async (req, res, next) => {
     try {
       const { query } = await GetUserSchema.parseAsync({ query: req.query });
-      const { data, message } = await userService.get({ query, user: req.user! });
+      const data = await userService.get({ query, user: req.user! });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('user_info') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
@@ -57,9 +57,9 @@ export async function userRouter(router: Router): Promise<void> {
   router.get('/user/list', authJwt, async (req, res, next) => {
     try {
       const { query } = await ListUserSchema.parseAsync({ query: req.query });
-      const { data, message } = await userService.list({ query, user: req.user! });
+      const data = await userService.list({ query, user: req.user! });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('list_users') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
@@ -68,9 +68,9 @@ export async function userRouter(router: Router): Promise<void> {
   router.patch('/user', authJwt, isAdminMiddleware, async (req, res, next) => {
     try {
       const { body, query } = await UpdateUserSchema.parseAsync({ body: req.body, query: req.query });
-      const { data, message } = await userService.update({ body, query });
+      const data = await userService.update({ body, query });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('user_updated') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
@@ -79,9 +79,9 @@ export async function userRouter(router: Router): Promise<void> {
   router.delete('/user/track-exercise/:trackId', authJwt, async (req, res, next) => {
     try {
       const { params } = await UserRemoveTrackExerciseSchema.parseAsync({ params: req.params });
-      const { message } = await userService.removeTrackedExercise({ params, user: req.user! });
+      await userService.removeTrackedExercise({ params, user: req.user! });
 
-      res.json({ message }).status(HttpStatus.OK);
+      res.json({ message: res.__('tracked_exercise_deleted') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }

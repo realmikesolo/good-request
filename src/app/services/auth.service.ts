@@ -15,10 +15,7 @@ import { JwtPayload } from '../strategies/jwt.strategy';
 export class AuthService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  public async register(ctx: RegisterDto): Promise<{
-    data: Pick<UserModel, 'id' | 'email' | 'role'>;
-    message: string;
-  }> {
+  public async register(ctx: RegisterDto): Promise<Pick<UserModel, 'id' | 'email' | 'role'>> {
     const { body } = ctx;
 
     let user: UserModel;
@@ -34,19 +31,13 @@ export class AuthService {
     }
 
     return {
-      data: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      message: 'User created',
+      id: user.id,
+      email: user.email,
+      role: user.role,
     };
   }
 
-  public async login(ctx: LoginDto): Promise<{
-    data: { token: string };
-    message: string;
-  }> {
+  public async login(ctx: LoginDto): Promise<{ token: string }> {
     const { body } = ctx;
 
     const user = await this.userRepository.findOneByEmail({ email: body.email });
@@ -60,13 +51,10 @@ export class AuthService {
     }
 
     return {
-      data: {
-        token: this.generateToken({
-          id: user.id,
-          role: user.role,
-        }),
-      },
-      message: 'User logged in',
+      token: this.generateToken({
+        id: user.id,
+        role: user.role,
+      }),
     };
   }
 

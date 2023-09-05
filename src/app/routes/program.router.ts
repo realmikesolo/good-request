@@ -12,9 +12,9 @@ export async function programRouter(router: Router): Promise<void> {
   router.get('/program/list', async (req, res, next) => {
     try {
       const { query } = await ListProgramSchema.parseAsync({ query: req.query });
-      const { data, message } = await programService.list({ query });
+      const data = await programService.list({ query });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('list_programs') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }

@@ -12,9 +12,9 @@ export async function authRouter(router: Router): Promise<void> {
   router.post('/auth/register', async (req, res, next) => {
     try {
       const { body } = await RegisterSchema.parseAsync({ body: req.body });
-      const { data, message } = await authService.register({ body });
+      const data = await authService.register({ body });
 
-      res.json({ data, message }).status(HttpStatus.CREATED);
+      res.json({ data, message: res.__('user_created') }).status(HttpStatus.CREATED);
     } catch (e) {
       next(e);
     }
@@ -23,9 +23,9 @@ export async function authRouter(router: Router): Promise<void> {
   router.post('/auth/login', async (req, res, next) => {
     try {
       const { body } = await LoginSchema.parseAsync({ body: req.body });
-      const { data, message } = await authService.login({ body });
+      const data = await authService.login({ body });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('user_logged_in') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }

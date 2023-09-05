@@ -24,9 +24,9 @@ export async function exerciseRouter(router: Router): Promise<void> {
   router.post('/exercise', authJwt, isAdminMiddleware, async (req, res, next) => {
     try {
       const { body } = await CreateExerciseSchema.parseAsync({ body: req.body });
-      const { data, message } = await exerciseService.create({ body });
+      const data = await exerciseService.create({ body });
 
-      res.json({ data, message }).status(HttpStatus.CREATED);
+      res.json({ data, message: res.__('exercise_created') }).status(HttpStatus.CREATED);
     } catch (e) {
       next(e);
     }
@@ -35,9 +35,9 @@ export async function exerciseRouter(router: Router): Promise<void> {
   router.post('/exercise/:id/program/:programId', authJwt, isAdminMiddleware, async (req, res, next) => {
     try {
       const { params } = await AddExerciseToProgramSchema.parseAsync({ params: req.params });
-      const { data, message } = await exerciseService.addToProgram({ params });
+      const data = await exerciseService.addToProgram({ params });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('add_exercise_to_program') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
@@ -46,9 +46,9 @@ export async function exerciseRouter(router: Router): Promise<void> {
   router.get('/exercise/list', async (req, res, next) => {
     try {
       const { query } = await ListExerciseSchema.parseAsync({ query: req.query });
-      const { data, message } = await exerciseService.list({ query });
+      const data = await exerciseService.list({ query });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('list_exercise') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
@@ -57,9 +57,9 @@ export async function exerciseRouter(router: Router): Promise<void> {
   router.patch('/exercise/:id', authJwt, isAdminMiddleware, async (req, res, next) => {
     try {
       const { params, body } = await UpdateExerciseSchema.parseAsync({ params: req.params, body: req.body });
-      const { data, message } = await exerciseService.update({ params, body });
+      const data = await exerciseService.update({ params, body });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('exercise_updated') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
@@ -68,9 +68,9 @@ export async function exerciseRouter(router: Router): Promise<void> {
   router.delete('/exercise/:id/program/:programId', authJwt, isAdminMiddleware, async (req, res, next) => {
     try {
       const { params } = await RemoveExerciseFromProgramSchema.parseAsync({ params: req.params });
-      const { data, message } = await exerciseService.removeFromProgram({ params });
+      const data = await exerciseService.removeFromProgram({ params });
 
-      res.json({ data, message }).status(HttpStatus.OK);
+      res.json({ data, message: res.__('remove_exercise_from_program') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
@@ -79,9 +79,9 @@ export async function exerciseRouter(router: Router): Promise<void> {
   router.delete('/exercise/:id', authJwt, isAdminMiddleware, async (req, res, next) => {
     try {
       const { params } = await DeleteExerciseSchema.parseAsync({ params: req.params });
-      const { message } = await exerciseService.delete({ params });
+      await exerciseService.delete({ params });
 
-      res.json({ message }).status(HttpStatus.OK);
+      res.json({ message: res.__('exercise_deleted') }).status(HttpStatus.OK);
     } catch (e) {
       next(e);
     }
